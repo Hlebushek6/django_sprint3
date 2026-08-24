@@ -9,10 +9,11 @@ User = get_user_model()
 # Create your models here.
 class PublishedModel(models.Model):
     is_published = models.BooleanField(
-        'Опубликовано', default=True, help_text='Снимите галочку, чтобы скрыть публикацию.'
+        'Опубликовано',
+        default=True,
+        help_text='Снимите галочку, чтобы скрыть публикацию.'
     )
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
-
 
     class Meta:
         abstract = True
@@ -24,9 +25,9 @@ class Category(PublishedModel):
     slug = models.SlugField(
         'Идентификатор',
         unique=True,
-        help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.'
+        help_text='Идентификатор страницы для URL; '
+                  'разрешены символы латиницы, цифры, дефис и подчёркивание.'
     )
-
 
     class Meta:
         verbose_name = 'категория'
@@ -35,7 +36,6 @@ class Category(PublishedModel):
 
 class Location(PublishedModel):
     name = models.CharField('Название места', max_length=256)
-
 
     class Meta:
         verbose_name = 'местоположение'
@@ -47,7 +47,8 @@ class Post(PublishedModel):
     text = TextField('Текст')
     pub_date = DateTimeField(
         'Дата и время публикации',
-        help_text='Если установить дату и время в будущем — можно делать отложенные публикации.'
+        help_text='Если установить дату и время в будущем — '
+                  'можно делать отложенные публикации.'
     )
     author = models.ForeignKey(
         User,
@@ -67,7 +68,6 @@ class Post(PublishedModel):
         null=True,
         verbose_name='Категория'
     )
-
 
     class Meta:
         verbose_name = 'публикация'

@@ -1,31 +1,30 @@
-from datetime import datetime
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from .models import Category, Post
+
+
+def get_published_posts():
+    posts = Post.objects.select_related(
+        'category', 'location', 'author'
+    ).filter(
+        pub_date__lte=timezone.now(),
+        is_published=True,
+        category__is_published=True
+    )
+    return posts
 
 
 # Create your views here.
 def index(request):
     template = 'blog/index.html'
-    posts = Post.objects.select_related(
-        'category', 'location', 'author'
-    ).filter(
-        pub_date__lte=datetime.now(),
-        is_published=True,
-        category__is_published=True
-    ).order_by('-pub_date')[:5]
+    posts = get_published_posts()[:5]
     context = {'post_list': posts}
     return render(request, template, context)
 
 
 def post_detail(request, id):
     template = 'blog/detail.html'
-    post = get_object_or_404(Post.objects.select_related(
-        'category', 'location', 'author'
-    ).filter(
-        pub_date__lte=datetime.now(),
-        is_published=True,
-        category__is_published=True
-    ), pk=id)
+    post = get_object_or_404(get_published_posts(), pk=id)
     context = {'post': post}
     return render(request, template, context)
 
@@ -35,11 +34,10 @@ def category_posts(request, category_slug):
     category = get_object_or_404(
         Category.objects.all().filter(is_published=True), slug=category_slug
     )
-    posts = Post.objects.select_related(
+    posts = category.posts.select_related(
         'category', 'location', 'author'
     ).filter(
-        category__slug=category_slug,
-        pub_date__lte=datetime.now(),
+        pub_date__lte=timezone.now(),
         is_published=True
     ).order_by('-pub_date')
     context = {'category': category, 'post_list': posts}
